@@ -1,0 +1,169 @@
+/**
+ * This class generates the Text Layer into the active PS document, and set
+ * all its parameters.
+ *
+ * @param {object} options - the model object with all dialogs values.
+ * @constructor
+ */
+function SGSignature ( options ) {
+    if ( options ) {
+        this.text = options.signature;
+        this.font = options.font;
+        this.size = options.size;
+        this.ratio = options.ratio;
+        this.color = {
+            r: options.color.r,
+            g: options.color.g,
+            b: options.color.b,
+            opacity: options.color.opacity };
+    } else {
+        this.text = 'Dummy Text';
+        this.font = 'Arial';
+        this.size = 16;
+        this.ratio = [ 0, 0, 0 ];
+        this.color = { r: 0, g: 0, b: 0, opacity: 100 };
+    }
+
+    this.docRef = null;
+    this.layerRef = null;
+    this.width = 0;
+    this.height = 0;
+    this.top = 0;
+    this.left = 0;
+    this.adjustment = 1;
+    this.previewMode = false;
+}
+
+/**
+ * Calculates the document diagonal with classic euclidean distance formula
+ * @param {number} width - document's width in pixels
+ * @param {number} height - document's height in pixels
+ * @returns {number} the document's diagonal
+ */
+SGSignature.prototype.calcDiagonal = function ( width, height ) {
+    return Math.sqrt( width*width + height*height );
+};
+
+/**
+ * Calculates the text layer's font size according to the current operating mode,
+ * original document's ratio, and current document's form factor adjustment.
+ * @returns {number} the original or adjusted font size
+ */
+SGSignature.prototype.calcFontSize = function () {
+    return this.previewMode ? this.size : this.diag * this.ratio[2] * this.adjustment;
+};
+
+/**
+ * Calcualtes the text layer's position according to the current operating mode,
+ * original document's ratios, and current document's form factor adjustment.
+ * @param {number[]} coordinates - relative or absolute layer's coordinates
+ * @returns {number[]} the original or adjusted coordinates
+ */
+SGSignature.prototype.calcPosition = function ( coordinates ) {
+    return [
+        this.previewMode ? coordinates[0] : this.diag * this.ratio[0] * this.adjustment,
+        this.previewMode ? coordinates[1] : this.diag * this.ratio[1] * this.adjustment
+    ];
+};
+
+/**
+ * Calculates the current layer dimensions.
+ */
+SGSignature.prototype.calcSize = function () {
+    this.width = this.layerRef.bounds[2].value - this.layerRef.bounds[0].value;
+    this.height = this.layerRef.bounds[3].value - this.layerRef.bounds[1].value;
+};
+
+/**
+ * Calculates the correct position according to the chosen alignment.
+ *
+ * @param {object} options - see the constructor
+ */
+SGSignature.prototype.bake = function ( options ) {
+    var Alignment = { RELATIVE: 0, ABSOLUTE: 1 },
+        position;
+
+    this.calcSize();
+    switch ( options.alignment ) {
+        case Alignment.RELATIVE:
+            position = this.calcPosition( [ options.position.offsetX, options.position.offsetY ] );
+
+            if ( options.position.tl || options.position.tr ) {
+                this.top = position[ 1 ];
+            } else if ( options.position.bl || options.position.br ) {
+                this.top = this.docRef.height - this.height - position[ 1 ];
+            } else {
+                this.top = ( this.docRef.height - this.height ) / 2;
+            }
+
+            if ( options.position.tl || options.position.bl ) {
+                this.left = position[ 0 ];
+            } else if ( options.position.tr || options.position.br ) {
+                this.left = this.docRef.width - this.width - position[ 0 ];
+            } else {
+                this.left = ( this.docRef.width - this.width ) / 2;
+            }
+            break;
+
+        case Alignment.ABSOLUTE:
+            position = this.calcPosition( [ options.position.left, options.position.top ] );
+            this.top = position[ 1 ];
+            this.left = position[ 0 ];
+            break;
+
+        default:
+            this.top = this.docRef.height - this.height;
+            this.left = this.docRef.width - this.width;
+    }
+};
+
+/**
+ * Removes the layer from the active document.
+ */
+SGSignature.prototype.remove = function () {
+    if ( this.layerRef ) {
+        this.layerRef.remove();
+        this.layerRef = null;
+    }
+};
+
+/**
+ * Creates and display the layer into the active document.
+ * @param options
+ */
+SGSignature.prototype.render = function ( options ) {
+    var color;
+
+    if ( this.docRef ) {
+        this.layerRef = this.docRef.artLayers.add();
+        if ( this.layerRef ) {
+            this.layerRef.kind = LayerKind.TEXT;
+            color = new SolidColor();
+            color.rgb.red = 0;
+            color.rgb.green = 0;
+            color.rgb.blue = 0;
+            this.layerRef.textItem.color = color;
+            this.update( options );
+        }
+    }
+};
+
+/**
+ * Updates the layer properties.
+ * @param options
+ */
+SGSignature.prototype.update = function ( options ) {
+    if ( this.layerRef ) {
+        this.diag = this.calcDiagonal( this.docRef.width, this.docRef.height );
+        this.adjustment = this.docRef.width >= this.docRef.height ? 1 : 0.75;
+        this.layerRef.textItem.contents = this.text;
+        this.layerRef.textItem.size = this.calcFontSize();
+        this.layerRef.textItem.font = this.font;
+        this.layerRef.textItem.color.rgb.red = this.color.r;
+        this.layerRef.textItem.color.rgb.green = this.color.g;
+        this.layerRef.textItem.color.rgb.blue = this.color.b;
+        this.layerRef.opacity = this.color.opacity;
+        this.bake( options );
+        this.layerRef.textItem.position = [ this.left, this.top + this.height ];
+    }
+};

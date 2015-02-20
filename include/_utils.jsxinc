@@ -1,0 +1,49 @@
+/**
+ * Resolves for an object path returning the last found node.
+ *
+ * @param {object} rootObj - the root object to resolve the path for
+ * @param {string} objPath - the object path to be resolved
+ * @returns {object|undefined}
+ */
+function resolveNS ( rootObj, objPath ) {
+    var ref = rootObj,
+        nodes = objPath.split( '.' );
+
+    if ( !rootObj ) return;
+
+    for ( var i = 0, l = nodes.length; i < l; i++ ) {
+        if ( ref.hasOwnProperty( nodes[i] ) ) {
+            ref = ref[ nodes[i] ];
+        } else {
+            return;
+        }
+    }
+    return ref;
+}
+
+/**
+ * Simple templating system.
+ *
+ * @param {string} tmpl - template string
+ * @param {object} data - parameters to be replaced with
+ * @param {boolean} useLocalize - if true, every object parameter found will
+ *  be processed with localize().
+ *
+ * @returns {string} the processed template.
+ */
+function template ( tmpl, data, useLocalize ) {
+    var reInterpolation = /{{\s*([a-zA-Z0-9_.]+)\s*}}/g;
+
+    if ( !( typeof tmpl == 'string' || typeof data == 'object' ) ) return tmpl;
+
+    return tmpl.replace( reInterpolation, function ( match, group ) {
+        var value = resolveNS( data, group );
+
+        if ( value ) {
+            if ( useLocalize && typeof value == 'object' ) value = localize( value );
+            return value;
+        } else {
+            return match;
+        }
+    } );
+}

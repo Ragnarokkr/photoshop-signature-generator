@@ -1,0 +1,67 @@
+﻿var i18n = {
+    title: { it: 'Generatore di Firma', en: 'Signature Generator' },
+    textData: {
+        signature: { it: 'Firma:', en: 'Signature:' },
+        placeholder: { it: 'testo della firma', en: 'signature text' }
+    },
+    tabFont: {
+        title: { it: 'Carattere', en: 'Font' },
+        fontData: {
+            title: { it: 'Famiglia', en: 'Family' }
+        },
+        fontAspect: {
+            title: { it: 'Aspetto', en: 'Aspect' },
+            opacity: { it: 'Opacità:', en: 'Opacity:' },
+            colorPicker: { it: 'Scegli un colore...', en: 'Pick a color...' }
+        }
+    },
+    tabAlignment: {
+        title: { it: 'Allineamento', en: 'Alignment' },
+        toggle: {
+            title: { it: 'Tipo:', en: 'Type:' },
+            relative: { it: 'Relativo', en: 'Relative' },
+            absolute: { it: 'Assoluto', en: 'Absolute' },
+            helpTip: {
+                it: 'Tipo di posizionamento. "Relativo" posiziona la firma in relazione ai lati del documento. "Assoluto" posiziona la firma in base a coordinate assolute.',
+                en: 'Type of alignment. "Relative" aligns the signature relative to document\'s edges. "Absolute" uses absolute coordinates to align the signature.'
+            }},
+        relative: {
+            title: { it: 'Relativo', en: 'Relative' },
+            position: {
+                topLeft: { it: 'In alto a sinistra', en: 'Top Left' },
+                topRight: { it: 'In alto a destra', en: 'Top Right' },
+                middle: { it: 'Al centro', en: 'Center' },
+                bottomLeft: { it: 'In basso a sinistra', en: 'Bottom Left' },
+                bottomRight: { it: 'In basso a destra', en: 'Bottom Right' },
+                helpTipOffsetX: {
+                    it: 'Spostamento orizzontale della firma in relazione al lato di riferimento',
+                    en: 'Horizontal signature offset in relation to the document\'s edge of choice'
+                },
+                helpTipOffsetY: {
+                    it: 'Spostamento verticale della firma in relazione al lato di riferimento',
+                    en: 'Vertical signature offset in relation to the document\'s edge of choice'
+                }
+            }
+        },
+        absolute: {
+            title: { it: 'Assoluto', en: 'Absolute' },
+            helpTipTop: { it: 'Posizione assoluta dal lato superiore del documento', en: 'Absolute position from document\'s top edge' },
+            helpTipLeft: { it: 'Posizione assoluta dal lato sinistro del documento', en: 'Absolute position from document\'s left edge' }
+        }
+    },
+    tabAbout: {
+        title: { it: 'Licenza', en: 'License' }
+    },
+    buttons: {
+        preview: { it: 'Anteprima', en: 'Preview' },
+        helpTipPreview: { it: 'Aggiorna l\'anteprima nel documento attivo.', en: 'Update the preview into the active document.' },
+        generate: { it: 'Genera', en: 'Generate' },
+        helpTipGenerate: { it: 'Crea la firma in tutti i documenti aperti.', en: 'Make the signature for all the opened documents.' }
+    },
+    errors: {
+        noDocuments: {
+            it: 'Questo script richiede che sia aperto almeno un documento.',
+            en: 'This script requires at least one opened document.'
+        }
+    }
+};

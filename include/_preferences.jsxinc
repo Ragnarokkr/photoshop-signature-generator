@@ -1,0 +1,35 @@
+/**
+ * Simple I/O handler for app preferences.
+ * @type {object}
+ */
+var sgPreferences = {
+    savedPrefs: {},
+
+    set: function ( prefs ) {
+        for ( var i in prefs ) {
+            if ( prefs.hasOwnProperty( i ) &&
+                 preferences.hasOwnProperty( i ) ) {
+                if ( !this.savedPrefs.hasOwnProperty( i ) ) {
+                    this.savedPrefs[ i ] = preferences[i];
+                }
+                preferences[i] = prefs[i]
+            }
+        }
+
+        return this;
+    },
+
+    restore: function () {
+        this.set( this.savedPrefs );
+        return this;
+    },
+
+    init: function ( prefs ) {
+        if ( !(typeof prefs == 'object' ) ) {
+            this.savedPrefs = {};
+            return;
+        }
+        this.set( prefs );
+        return this;
+    }
+};

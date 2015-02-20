@@ -1,0 +1,64 @@
+﻿/**
+ * This class generates a window dialog by using resource strings or
+ * classic javascript objects.
+ *
+ * @param {string} [resource] - the resource string
+ * @constructor
+ */
+function SGDialog ( resource ) {
+    if ( typeof resource == 'string' ) {
+        // dialog is created by resource string
+        this.winRef = new Window( resource );
+    } else {
+        // create the bare dialog
+        this.winRef = new Window( 'dialog{}' );
+    }
+}
+
+/**
+ * Loads the resources string from a resource file.
+ * @param {string} id - resource id (it is the resource filename without
+ *  extension.)
+ * @param {object} locales - an object with locales for i18n
+ * @returns {SGDialog}
+ */
+SGDialog.load = function ( id, locales ) {
+    var resource,
+        f = new File( RSRCPATH + '/' + id + '.rsrc' );
+
+    if ( f.open( 'r' ) ) {
+        try {
+            resource = f.read();
+            f.close();
+            if ( typeof locales == 'object' ) {
+                return new SGDialog( template( resource, locales ) );
+            } else {
+                return new SGDialog( resource );
+            }
+        } catch ( e ) {
+            alert( e + ': ' + e.line, localize( i18n.title ), true );
+        }
+    }
+};
+
+/**
+ * Returns the reference to the dialog object.
+ * @returns {Window|*}
+ */
+SGDialog.prototype.getDialog = function () {
+    return this.winRef;
+};
+
+/**
+ * Generate the window dialog and executes the eventually user-defined
+ * handlers.
+ */
+SGDialog.prototype.render = function () {
+    // Call user-defined methods
+    if ( this.onInit ) this.onInit( this.winRef );
+    if ( this.onBeforeRender ) this.onBeforeRender( this.winRef );
+
+    // Render the final dialog
+    this.winRef.layout.layout();
+    this.winRef.show();
+};
